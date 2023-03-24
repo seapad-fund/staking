@@ -1,9 +1,10 @@
 /// Collection of entrypoints to handle staking pools.
 module staking::scripts {
     use staking::stake;
+    use staking::config;
     use sui::tx_context::{TxContext, sender};
     use sui::coin::{Coin, CoinMetadata};
-    use staking::config::GlobalConfig;
+    use staking::config::{GlobalConfig};
 //    use sui::clock::Clock;
     use staking::stake::StakePool;
     use sui::transfer;
@@ -108,5 +109,30 @@ module staking::scripts {
         let treasury_addr = sender(ctx);
         let rewards = stake::withdraw_to_treasury<S, R>(pool, amount, global_config, system_clock, ctx);
         transfer::transfer(rewards, treasury_addr);
+    }
+
+    /// Sets `emergency_admin` account.
+   /// Should be signed with current `emergency_admin` account.
+   ///     * `stake_admin` - current emergency admin account.
+   ///     * `new_address` - new emergency admin address.
+    public entry fun set_stake_admin_address(global_config: &mut GlobalConfig, new_address: address, ctx: &mut TxContext) {
+        config::set_stake_admin_address(global_config, new_address, ctx);
+    }
+
+
+    /// Sets `treasury_admin` account.
+    /// Should be signed with current `treasury_admin` account.
+    ///     * `global_config` - current treasury admin account.
+    ///     * `new_address` - new treasury admin address.
+    ///     * ctx: current treasury_admin
+    public entry fun set_treasury_admin_address(global_config: &mut GlobalConfig, new_address: address, ctx: &mut TxContext) {
+        config::set_treasury_admin_address(global_config, new_address, ctx);
+    }
+
+    /// Enables "global emergency state". All the pools' operations are disabled except for `emergency_unstake()`.
+    /// This state cannot be disabled, use with caution.
+    ///     * `emergency_admin` - current emergency admin account.
+    public entry fun enable_global_emergency(global_config: &mut GlobalConfig, ctx: &mut TxContext) {
+       config::enable_global_emergency(global_config, ctx);
     }
 }

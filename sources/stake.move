@@ -68,6 +68,9 @@ module staking::stake {
     /// When not treasury withdrawing.
     const ERR_NOT_TREASURY: u64 = 115;
 
+    /// When no permission.
+    const ERR_NOT_ADMIN: u64 = 116;
+
     /// When reward coin has more than 10 decimals.
     const ERR_INVALID_REWARD_DECIMALS: u64 = 123;
 
@@ -143,11 +146,14 @@ module staking::stake {
         system_clock: u64,
         ctx: &mut TxContext
     ) {
+        assert!(sender(ctx) == config::get_stake_admin_address(global_config), ERR_NOT_ADMIN);
+
         assert!(!config::is_global_emergency(global_config), ERR_EMERGENCY);
         assert!(duration_second > 0, ERR_DURATION_CANNOT_BE_ZERO);
 
         let reward_per_sec = coin::value(&reward_coins) / duration_second;
-        assert!(reward_per_sec > 0, ERR_REWARD_CANNOT_BE_ZERO);
+
+        assert!(reward_per_sec >= 0, ERR_REWARD_CANNOT_BE_ZERO);
 
         let current_time= system_clock/1000; //@todo review math div
         let end_timestamp = current_time + duration_second;
@@ -207,10 +213,11 @@ module staking::stake {
         let amount = coin::value(&coins);
         assert!(amount > 0, ERR_AMOUNT_CANNOT_BE_ZERO);
 
-        let additional_duration = amount / pool.reward_per_sec;
-        assert!(additional_duration > 0, ERR_DURATION_CANNOT_BE_ZERO);
-
-        pool.end_timestamp = pool.end_timestamp + additional_duration;
+        if(pool.reward_per_sec > 0){
+            let additional_duration = amount / pool.reward_per_sec;
+            assert!(additional_duration > 0, ERR_DURATION_CANNOT_BE_ZERO);
+            pool.end_timestamp = pool.end_timestamp + additional_duration;
+        };
 
         coin::join(&mut pool.reward_coins, coins);
 
@@ -373,7 +380,7 @@ module staking::stake {
                                       global_config: &GlobalConfig,
                                       ctx: &mut TxContext) {
         assert!(
-            sender(ctx) == config::get_emergency_admin_address(global_config),
+            sender(ctx) == config::get_stake_admin_address(global_config),
             ERR_NOT_ENOUGH_PERMISSIONS_FOR_EMERGENCY
         );
 
@@ -577,8 +584,7 @@ module staking::stake {
         let total_stake = pool_total_staked(pool);
         if (total_stake == 0) return 0;
 
-        let total_rewards =
-            (pool.reward_per_sec as u128) * (seconds_passed as u128) * pool.scale;
+        let total_rewards = (pool.reward_per_sec as u128) * (seconds_passed as u128) * pool.scale;
         total_rewards / total_stake
     }
 

@@ -28,7 +28,7 @@ module staking::config {
     /// Global config: contains emergency lock and admin address.
     struct GlobalConfig has key, store {
         id: UID,
-        emergency_admin_address: address,
+        stake_admin_address: address,
         treasury_admin_address: address,
         global_emergency_locked: bool,
     }
@@ -39,10 +39,10 @@ module staking::config {
     ///     * `emergency_admin` - initial emergency admin account.
     ///     * `treasury_admin` - initial treasury admin address.
     fun init(_witness: CONFIG, ctx: &mut TxContext){
-        assert!(sender(ctx) == @stake_emergency_admin, ERR_NO_PERMISSIONS);
+        assert!(sender(ctx) == @stake_admin, ERR_NO_PERMISSIONS);
         transfer::share_object(GlobalConfig {
             id: object::new(ctx),
-            emergency_admin_address: @stake_emergency_admin,
+            stake_admin_address: @stake_admin,
             treasury_admin_address: @treasury_admin,
             global_emergency_locked: false,
         })
@@ -55,17 +55,17 @@ module staking::config {
 
     /// Sets `emergency_admin` account.
     /// Should be signed with current `emergency_admin` account.
-    ///     * `emergency_admin` - current emergency admin account.
+    ///     * `stake_admin` - current emergency admin account.
     ///     * `new_address` - new emergency admin address.
-    public entry fun set_emergency_admin_address(global_config: &mut GlobalConfig, new_address: address, ctx: &mut TxContext) {
-        assert!(sender(ctx) == global_config.emergency_admin_address, ERR_NO_PERMISSIONS);
-        global_config.emergency_admin_address = new_address;
+    public fun set_stake_admin_address(global_config: &mut GlobalConfig, new_address: address, ctx: &mut TxContext) {
+        assert!(sender(ctx) == global_config.stake_admin_address, ERR_NO_PERMISSIONS);
+        global_config.stake_admin_address = new_address;
     }
 
     /// Gets current address of `emergency_admin` account.
     /// Returns address of emergency admin account.
-    public fun get_emergency_admin_address(global_config: &GlobalConfig): address {
-        global_config.emergency_admin_address
+    public fun get_stake_admin_address(global_config: &GlobalConfig): address {
+        global_config.stake_admin_address
     }
 
     /// Sets `treasury_admin` account.
@@ -73,7 +73,7 @@ module staking::config {
     ///     * `global_config` - current treasury admin account.
     ///     * `new_address` - new treasury admin address.
     ///     * ctx: current treasury_admin
-    public entry fun set_treasury_admin_address(global_config: &mut GlobalConfig, new_address: address, ctx: &mut TxContext) {
+    public fun set_treasury_admin_address(global_config: &mut GlobalConfig, new_address: address, ctx: &mut TxContext) {
         assert!(sender(ctx) == global_config.treasury_admin_address, ERR_NO_PERMISSIONS);
         global_config.treasury_admin_address = new_address;
     }
@@ -87,8 +87,8 @@ module staking::config {
     /// Enables "global emergency state". All the pools' operations are disabled except for `emergency_unstake()`.
     /// This state cannot be disabled, use with caution.
     ///     * `emergency_admin` - current emergency admin account.
-    public entry fun enable_global_emergency(global_config: &mut GlobalConfig, ctx: &mut TxContext) {
-        assert!(sender(ctx) == global_config.emergency_admin_address, ERR_NO_PERMISSIONS);
+    public fun enable_global_emergency(global_config: &mut GlobalConfig, ctx: &mut TxContext) {
+        assert!(sender(ctx) == global_config.stake_admin_address, ERR_NO_PERMISSIONS);
         assert!(!global_config.global_emergency_locked, ERR_GLOBAL_EMERGENCY);
         global_config.global_emergency_locked = true;
     }
