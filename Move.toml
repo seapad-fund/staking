@@ -11,8 +11,9 @@ W3libs = { git = "https://github.com/seapad-fund/w3libs", rev = "devnet0xa9262" 
 sui =  "0x02"
 staking = "0x00"
 
-treasury_admin = "0x385514285b7b7499455c8c395c4995baf7ab97ba"
 stake_admin = "0x385514285b7b7499455c8c395c4995baf7ab97ba"
+treasury_admin = "0x385514285b7b7499455c8c395c4995baf7ab97ba"
+escrow_admin = "0x385514285b7b7499455c8c395c4995baf7ab97ba"
 
 # Test addresses.
 treasury = "0x13"

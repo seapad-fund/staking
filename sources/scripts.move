@@ -5,7 +5,7 @@ module staking::scripts {
     use sui::tx_context::{TxContext, sender};
     use sui::coin::{Coin, CoinMetadata};
     use staking::config::{GlobalConfig};
-//    use sui::clock::Clock;
+    //    use sui::clock::Clock;
     use staking::stake::StakePool;
     use sui::transfer;
 
@@ -133,6 +133,15 @@ module staking::scripts {
     /// This state cannot be disabled, use with caution.
     ///     * `emergency_admin` - current emergency admin account.
     public entry fun enable_global_emergency(global_config: &mut GlobalConfig, ctx: &mut TxContext) {
-       config::enable_global_emergency(global_config, ctx);
+        config::enable_global_emergency(global_config, ctx);
+    }
+
+    /// Sets `escrow_admin` account.
+    /// Should be signed with current `escrow_admin` account.
+    ///     * `global_config` - current escrow admin account.
+    ///     * `new_address` - new treasury admin address.
+    ///     * ctx: current escrow_admin
+    public entry fun set_escrow_admin_address(global_config: &mut GlobalConfig, new_address: address, ctx: &mut TxContext) {
+        config::set_escrow_admin_address(global_config, new_address, ctx);
     }
 }
