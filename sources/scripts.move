@@ -5,7 +5,6 @@ module staking::scripts {
     use sui::tx_context::{TxContext, sender};
     use sui::coin::{Coin, CoinMetadata};
     use staking::config::{GlobalConfig};
-    //    use sui::clock::Clock;
     use staking::stake::StakePool;
     use sui::transfer;
 
@@ -47,7 +46,7 @@ module staking::scripts {
                                    system_clock_ms: u64,
                                    ctx: &mut TxContext) {
         let coins = stake::unstake<S, R>(pool, stake_amount, global_config, system_clock_ms, ctx);
-        transfer::transfer(coins, sender(ctx));
+        transfer::public_transfer(coins, sender(ctx));
     }
 
     /// Collect `user` rewards on the pool at the `pool_addr`.
@@ -58,7 +57,7 @@ module staking::scripts {
                                    system_clock_ms: u64,
                                    ctx: &mut TxContext) {
         let rewards = stake::harvest<S, R>(pool, global_config, system_clock_ms, ctx);
-        transfer::transfer(rewards, sender(ctx));
+        transfer::public_transfer(rewards, sender(ctx));
     }
 
     /// Deposit more `Coin<R>` rewards to the pool.
@@ -94,7 +93,7 @@ module staking::scripts {
                                              global_config: &GlobalConfig,
                                              ctx: &mut TxContext) {
         let stake_coins = stake::emergency_unstake<S, R>(pool, global_config, ctx);
-        transfer::transfer(stake_coins, sender(ctx));
+        transfer::public_transfer(stake_coins, sender(ctx));
     }
 
     /// Withdraw and deposit rewards to treasury.
@@ -108,7 +107,7 @@ module staking::scripts {
                                                        ctx: &mut TxContext) {
         let treasury_addr = sender(ctx);
         let rewards = stake::withdraw_to_treasury<S, R>(pool, amount, global_config, system_clock, ctx);
-        transfer::transfer(rewards, treasury_addr);
+        transfer::public_transfer(rewards, treasury_addr);
     }
 
     /// Sets `emergency_admin` account.

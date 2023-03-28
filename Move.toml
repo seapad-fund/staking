@@ -1,19 +1,19 @@
 [package]
 name = "Staking"
 version = "1.0.0"
-
+published-at = "0xd2e4886a3d02cad569442ace4929cf7545064ef831d2cb93910eb7398a292ba2"
 
 [dependencies]
-Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework", rev = "devnet" }
-W3libs = { git = "https://github.com/seapad-fund/w3libs", rev = "devnet0xa9262" }
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "devnet" }
+W3libs = { git = "https://github.com/seapad-fund/w3libs", rev = "0x27ae5" }
 
 [addresses]
 sui =  "0x02"
 staking = "0x00"
 
-stake_admin = "0x385514285b7b7499455c8c395c4995baf7ab97ba"
-treasury_admin = "0x385514285b7b7499455c8c395c4995baf7ab97ba"
-escrow_admin = "0x385514285b7b7499455c8c395c4995baf7ab97ba"
+stake_admin = "0x9d6f2e34e937842df89642cd96fba8509d4e47d297f716ce3a44df3070a79851"
+treasury_admin = "0x9d6f2e34e937842df89642cd96fba8509d4e47d297f716ce3a44df3070a79851"
+escrow_admin = "0x9d6f2e34e937842df89642cd96fba8509d4e47d297f716ce3a44df3070a79851"
 
 # Test addresses.
 treasury = "0x13"
