@@ -5,7 +5,7 @@ module staking::coin_stake {
     use sui::url;
     use sui::test_scenario;
     use sui::test_scenario::{Scenario};
-    use sui::transfer::{share_object};
+    use sui::transfer::{public_share_object};
 
     friend staking::emergency_tests;
 
@@ -45,7 +45,7 @@ module staking::coin_stake {
             b"COIN_STAKE",
             option::some(url::new_unsafe_from_bytes(b"coin_stake_url")),
             ctx);
-        share_object(metadata);
-        share_object(treasury);
+        public_share_object(metadata);
+        public_share_object(treasury);
     }
 }
