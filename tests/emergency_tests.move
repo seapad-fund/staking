@@ -20,8 +20,8 @@ module staking::emergency_tests {
     const START_TIME: u64 = 682981200;
 
     // utilities
-    fun scenario(): Scenario { test_scenario::begin(@stake_emergency_admin) }
-    fun admins(): (address, address) { (@stake_emergency_admin, @treasury) }
+    fun scenario(): Scenario { test_scenario::begin(@stake_admin) }
+    fun admins(): (address, address) { (@stake_admin, @treasury) }
 
     #[test]
     fun test_initialize() {
@@ -65,7 +65,7 @@ module staking::emergency_tests {
             {
                 let gConfig = test_scenario::take_shared<GlobalConfig>(scenario);
                 assert!(config::get_treasury_admin_address(&gConfig) == @treasury_admin, 1);
-                assert!(config::get_emergency_admin_address(&gConfig) == @stake_emergency_admin, 1);
+                assert!(config::get_stake_admin_address(&gConfig) == @stake_admin, 1);
                 assert!(!config::is_global_emergency(&gConfig), 1);
                 test_scenario::return_shared(gConfig)
             };

@@ -2,6 +2,7 @@
 #sui move build
 #sui move test
 sui client publish --force --with-unpublished-dependencies  --gas-budget 10000
+#sui client  upgrade --upgrade-capability 0xac516c02e7933bd9082240546bebbe737ca35e18e00d51beffaf653c8890c1bb --gas-budget 10000  --skip-fetch-latest-git-deps
 
 ##move  call
 export ENV_ADDR=0x385514285b7b7499455c8c395c4995baf7ab97ba

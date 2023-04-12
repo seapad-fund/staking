@@ -1,10 +1,10 @@
 /// Collection of entrypoints to handle staking pools.
 module staking::scripts {
     use staking::stake;
+    use staking::config;
     use sui::tx_context::{TxContext, sender};
     use sui::coin::{Coin, CoinMetadata};
-    use staking::config::GlobalConfig;
-//    use sui::clock::Clock;
+    use staking::config::{GlobalConfig};
     use staking::stake::StakePool;
     use sui::transfer;
 
@@ -46,7 +46,7 @@ module staking::scripts {
                                    system_clock_ms: u64,
                                    ctx: &mut TxContext) {
         let coins = stake::unstake<S, R>(pool, stake_amount, global_config, system_clock_ms, ctx);
-        transfer::transfer(coins, sender(ctx));
+        transfer::public_transfer(coins, sender(ctx));
     }
 
     /// Collect `user` rewards on the pool at the `pool_addr`.
@@ -57,7 +57,7 @@ module staking::scripts {
                                    system_clock_ms: u64,
                                    ctx: &mut TxContext) {
         let rewards = stake::harvest<S, R>(pool, global_config, system_clock_ms, ctx);
-        transfer::transfer(rewards, sender(ctx));
+        transfer::public_transfer(rewards, sender(ctx));
     }
 
     /// Deposit more `Coin<R>` rewards to the pool.
@@ -93,7 +93,7 @@ module staking::scripts {
                                              global_config: &GlobalConfig,
                                              ctx: &mut TxContext) {
         let stake_coins = stake::emergency_unstake<S, R>(pool, global_config, ctx);
-        transfer::transfer(stake_coins, sender(ctx));
+        transfer::public_transfer(stake_coins, sender(ctx));
     }
 
     /// Withdraw and deposit rewards to treasury.
@@ -107,6 +107,40 @@ module staking::scripts {
                                                        ctx: &mut TxContext) {
         let treasury_addr = sender(ctx);
         let rewards = stake::withdraw_to_treasury<S, R>(pool, amount, global_config, system_clock, ctx);
-        transfer::transfer(rewards, treasury_addr);
+        transfer::public_transfer(rewards, treasury_addr);
+    }
+
+    /// Sets `emergency_admin` account.
+   /// Should be signed with current `emergency_admin` account.
+   ///     * `stake_admin` - current emergency admin account.
+   ///     * `new_address` - new emergency admin address.
+    public entry fun set_stake_admin_address(global_config: &mut GlobalConfig, new_address: address, ctx: &mut TxContext) {
+        config::set_stake_admin_address(global_config, new_address, ctx);
+    }
+
+
+    /// Sets `treasury_admin` account.
+    /// Should be signed with current `treasury_admin` account.
+    ///     * `global_config` - current treasury admin account.
+    ///     * `new_address` - new treasury admin address.
+    ///     * ctx: current treasury_admin
+    public entry fun set_treasury_admin_address(global_config: &mut GlobalConfig, new_address: address, ctx: &mut TxContext) {
+        config::set_treasury_admin_address(global_config, new_address, ctx);
+    }
+
+    /// Enables "global emergency state". All the pools' operations are disabled except for `emergency_unstake()`.
+    /// This state cannot be disabled, use with caution.
+    ///     * `emergency_admin` - current emergency admin account.
+    public entry fun enable_global_emergency(global_config: &mut GlobalConfig, ctx: &mut TxContext) {
+        config::enable_global_emergency(global_config, ctx);
+    }
+
+    /// Sets `escrow_admin` account.
+    /// Should be signed with current `escrow_admin` account.
+    ///     * `global_config` - current escrow admin account.
+    ///     * `new_address` - new treasury admin address.
+    ///     * ctx: current escrow_admin
+    public entry fun set_escrow_admin_address(global_config: &mut GlobalConfig, new_address: address, ctx: &mut TxContext) {
+        config::set_escrow_admin_address(global_config, new_address, ctx);
     }
 }
